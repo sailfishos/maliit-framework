@@ -45,11 +45,9 @@ MImHwKeyboardTrackerPrivate::MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q
     present(false)
 {
 #ifdef HAVE_CONTEXTSUBSCRIBER
-    ContextProperty keyboardPresentProperty(keyboardPresent);
     keyboardOpenProperty.reset(new ContextProperty(keyboardOpen));
-    keyboardPresentProperty.waitForSubscription(true);
     keyboardOpenProperty->waitForSubscription(true);
-    present = keyboardPresentProperty.value().toBool();
+    present = true; // assume keyboard present as context property currently includes also external keyboards
     if (present) {
         QObject::connect(keyboardOpenProperty.data(), SIGNAL(valueChanged()),
                          q_ptr, SIGNAL(stateChanged()));
