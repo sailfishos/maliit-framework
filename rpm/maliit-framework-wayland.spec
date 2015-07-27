@@ -20,6 +20,7 @@ BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  fdupes
 BuildRequires:  pkgconfig(qt5-boostable)
+BuildRequires:  pkgconfig(contextkit-statefs)
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
 Conflicts:   maliit-framework-x11
@@ -91,7 +92,8 @@ pushd maliit-framework
     CONFIG+=enable-dbus-activation \
     CONFIG+=qt5-inputcontext \
     CONFIG+=lipstick \
-    CONFIG+=noxcb
+    CONFIG+=noxcb \
+    CONFIG+=enable-contextkit
 
 make %{?jobs:-j%jobs}
 popd
