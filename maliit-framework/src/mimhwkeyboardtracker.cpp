@@ -69,6 +69,7 @@ MImHwKeyboardTrackerPrivate::MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q
 
 void MImHwKeyboardTrackerPrivate::detectEvdev()
 {
+#ifndef HAVE_CONTEXTSUBSCRIBER
     // Use udev to enumerate all input devices, using evdev on each device to
     // find the first device offering a SW_TABLET_MODE switch. If found, this
     // switch is used to determine keyboard presence.
@@ -106,10 +107,12 @@ void MImHwKeyboardTrackerPrivate::detectEvdev()
     }
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
+#endif
 }
 
 void MImHwKeyboardTrackerPrivate::evdevEvent()
 {
+#ifndef HAVE_CONTEXTSUBSCRIBER
     // Parse the evdev event and look for SW_TABLET_MODE status.
 
     struct input_event ev;
@@ -127,11 +130,14 @@ void MImHwKeyboardTrackerPrivate::evdevEvent()
         evdevTabletModePending = -1;
         Q_EMIT stateChanged();
     }
-
+#endif
 }
 
 void MImHwKeyboardTrackerPrivate::tryEvdevDevice(const char *device)
 {
+    Q_UNUSED(device);
+
+#ifndef HAVE_CONTEXTSUBSCRIBER
     QFile *qfile = new QFile(this);
     unsigned char evbits[BITS2BYTES(EV_MAX)];
     int fd;
@@ -185,6 +191,7 @@ void MImHwKeyboardTrackerPrivate::tryEvdevDevice(const char *device)
         return;
 
     evdevTabletMode = TEST_BIT(SW_TABLET_MODE, state);
+#endif
 }
 
 MImHwKeyboardTrackerPrivate::~MImHwKeyboardTrackerPrivate()
