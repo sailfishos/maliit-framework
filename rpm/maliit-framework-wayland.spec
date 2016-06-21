@@ -1,7 +1,7 @@
 Name:       maliit-framework-wayland
 
 Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
-Version:    0.99.0
+Version:    0.99.1
 Release:    1
 Group:      System/Libraries
 License:    LGPLv2.1
