@@ -170,10 +170,10 @@ OTHER_FILES += \
     maliit-plugins.prf.in \
     maliit-defines.prf.in \
 
-outputFiles(config.h  maliit-defines.prf maliit-plugins.prf maliit-plugins.pc maliit-server.pc)
+outputFiles(config.h maliit-defines.prf maliit-plugins.prf maliit-plugins.pc maliit-server.pc)
 
 install_pkgconfig.path = $${LIBDIR}/pkgconfig
-install_pkgconfig.files = \
+install_pkgconfig.files += \
     $$OUT_PWD/MeegoImFramework.pc \
     $$OUT_PWD/maliit-plugins.pc \
     $$OUT_PWD/maliit-server.pc \
