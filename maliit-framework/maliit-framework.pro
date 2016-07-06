@@ -16,6 +16,7 @@ include(./config.pri)
         \\n\\t notests : Do not build tests \
         \\n\\t nodoc : Do not build documentation\
         \\n\\t local-install : Install everything underneath PREFIX, nothing to system directories reported by GTK+, Qt, DBus etc. \
+        \\n\\t glib : Compile GDBus bindings \
         \\n\\t wayland : Compile with support for wayland \
         \\n\\t qt5-inputcontext : Compile with Qt5 input context, replaces the one currently provided by Qt \
         \\n\\t noxcb : Compile without xcb support \
@@ -46,7 +47,13 @@ wayland {
     SUBDIRS += weston-protocols
 }
 
-SUBDIRS += connection src passthroughserver examples
+SUBDIRS += connection
+
+glib {
+    SUBDIRS += maliit-glib
+}
+
+SUBDIRS += src passthroughserver examples
 
 qt5-inputcontext {
     SUBDIRS += input-context
@@ -75,9 +82,9 @@ TARBALL_PATH = $$DIST_PATH$$TARBALL_SUFFIX
 
 # The 'make dist' target
 # Creates a tarball
-QMAKE_EXTRA_TARGETS += dist
-dist.target = dist
-dist.commands += git archive HEAD --prefix=$$DIST_NAME/ | bzip2 > $$TARBALL_PATH;
-dist.commands += md5sum $$TARBALL_PATH | cut -d \' \' -f 1 > $$DIST_PATH\\.md5
+QMAKE_EXTRA_TARGETS += release
+release.target = release
+release.commands += git archive HEAD --prefix=$$DIST_NAME/ | bzip2 > $$TARBALL_PATH;
+release.commands += md5sum $$TARBALL_PATH | cut -d \' \' -f 1 > $$DIST_PATH\\.md5
 
 OTHER_FILES += NEWS README INSTALL.local
