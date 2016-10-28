@@ -826,6 +826,11 @@ void MInputContext::updateInputMethodExtensions()
     }
     if (debug) qDebug() << InputContextName << __PRETTY_FUNCTION__;
 
+    if (!qGuiApp->focusObject()) {
+        qWarning() << "Qt focus handling broken!";
+        return;
+    }
+
     QVariantMap extensions = qGuiApp->focusObject()->property("__inputMethodExtensions").toMap();
     QVariant value;
     value = extensions.value("enterKeyIconSource");
