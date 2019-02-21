@@ -15,8 +15,8 @@ include(defines.pri)
 # Linker optimization for release build
 QMAKE_LFLAGS_RELEASE+=-Wl,--as-needed
 # Compiler warnings are error if the build type is debug
-QMAKE_CXXFLAGS_DEBUG+=-Werror -O0
-QMAKE_CFLAGS_DEBUG+=-Werror -O0
+QMAKE_CXXFLAGS_DEBUG+=-Werror
+QMAKE_CFLAGS_DEBUG+=-Werror
 
 OBJECTS_DIR = .obj
 MOC_DIR = .moc
