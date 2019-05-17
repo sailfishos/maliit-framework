@@ -1479,7 +1479,14 @@ void MIMPluginManager::handleWidgetStateChanged(unsigned int clientId,
         if (oldState.value(iter.key()) != iter.value()) {
             changedProperties.append(iter.key());
         }
-
+    }
+    for (QMap<QString, QVariant>::const_iterator iter = oldState.constBegin();
+         iter != oldState.constEnd();
+         ++iter)
+    {
+        if (!newState.contains(iter.key())) {
+            changedProperties.append(iter.key());
+        }
     }
 
     variant = newState[FocusStateAttribute];

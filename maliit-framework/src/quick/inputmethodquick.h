@@ -73,7 +73,7 @@ class InputMethodQuick
     Q_PROPERTY(bool predictionEnabled READ predictionEnabled NOTIFY predictionEnabledChanged)
     Q_PROPERTY(bool autoCapitalizationEnabled READ autoCapitalizationEnabled NOTIFY autoCapitalizationChanged)
     Q_PROPERTY(bool hiddenText READ hiddenText NOTIFY hiddenTextChanged)
-
+    Q_PROPERTY(QObject *extensions READ extensions NOTIFY extensionsChanged)
 public:
     //! Constructor
     //! \param host serves as communication link to framework and application. Managed by framework.
@@ -97,6 +97,7 @@ public:
     virtual void setKeyOverrides(const QMap<QString, QSharedPointer<MKeyOverride> > &overrides);
     virtual void handleFocusChange(bool focusIn);
     QList<MAbstractInputMethod::MInputMethodSubView> subViews(Maliit::HandlerState state) const;
+    bool imExtensionEvent(MImExtensionEvent *event);
     //! \reimp_end
 
     //! Propagates screen size to QML components.
@@ -142,6 +143,8 @@ public:
     bool autoCapitalizationEnabled();
     bool hiddenText();
 
+    QObject *extensions();
+
 Q_SIGNALS:
     //! Emitted when screen height changes.
     void screenHeightChanged(int height);
@@ -178,6 +181,7 @@ Q_SIGNALS:
     void predictionEnabledChanged();
     void autoCapitalizationChanged();
     void hiddenTextChanged();
+    void extensionsChanged();
 
 public Q_SLOTS:
     //! Sends preedit string. Called by QML components. See also MAbstractInputMethodHost::sendPreeditString()

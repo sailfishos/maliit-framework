@@ -688,7 +688,17 @@ void MInputContext::setDetectableAutoRepeat(bool enabled)
 
 QMap<QString, QVariant> MInputContext::getStateInformation() const
 {
+    QObject * const focusObject = QGuiApplication::focusObject();
+
     QMap<QString, QVariant> stateInformation;
+
+    if (focusObject) {
+        stateInformation = focusObject->property("__inputMethodExtensions").toMap();
+        stateInformation.remove(QStringLiteral("enterKeyIconSource"));
+        stateInformation.remove(QStringLiteral("enterKeyText"));
+        stateInformation.remove(QStringLiteral("enterKeyEnabled"));
+        stateInformation.remove(QStringLiteral("enterKeyHighlighted"));
+    }
 
     stateInformation["focusState"] = inputMethodAccepted();
 
