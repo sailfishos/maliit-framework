@@ -19,6 +19,7 @@
 
 #include <maliit/plugins/abstractinputmethodhost.h>
 #include <maliit/plugins/keyoverride.h>
+#include <maliit/plugins/updateevent.h>
 
 #include "abstractplatform.h"
 
@@ -28,6 +29,7 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickView>
+#include <QQmlPropertyMap>
 
 namespace Maliit
 {
@@ -85,6 +87,7 @@ public:
     bool m_autoCapitalizationEnabled;
     bool m_hiddenText;
     QSharedPointer<Maliit::AbstractPlatform> m_platform;
+    QScopedPointer<QQmlPropertyMap> m_extensions;
 
     InputMethodQuickPrivate(MAbstractInputMethodHost *host,
                             InputMethodQuick *im,
@@ -546,6 +549,24 @@ QList<MAbstractInputMethod::MInputMethodSubView> InputMethodQuick::subViews(Mali
     return sub_views;
 }
 
+bool InputMethodQuick::imExtensionEvent(MImExtensionEvent *event)
+{
+    Q_D(InputMethodQuick);
+
+    if (event->type() == MImExtensionEvent::Update && d->m_extensions) {
+        const QStringList keys = d->m_extensions->keys();
+        MImUpdateEvent * const update = static_cast<MImUpdateEvent *>(event);
+        for (const QString &property : update->propertiesChanged()) {
+            d->m_extensions->insert(property, update->value(property));
+        }
+
+        if (d->m_extensions->keys() != keys) {
+            Q_EMIT extensionsChanged();
+        }
+    }
+    return false;
+}
+
 void InputMethodQuick::onSentActionKeyAttributesChanged(const QString &, const MKeyOverride::KeyOverrideAttributes changedAttributes)
 {
     Q_D(InputMethodQuick);
@@ -639,6 +660,15 @@ bool InputMethodQuick::hiddenText()
 {
     Q_D(InputMethodQuick);
     return d->m_hiddenText;
+}
+
+QObject *InputMethodQuick::extensions()
+{
+    Q_D(InputMethodQuick);
+    if (!d->m_extensions) {
+        d->m_extensions.reset(new QQmlPropertyMap);
+    }
+    return d->m_extensions.data();
 }
 
 } // namespace Maliit
