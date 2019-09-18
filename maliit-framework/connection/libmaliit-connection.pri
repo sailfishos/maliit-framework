@@ -11,7 +11,7 @@ INCLUDEPATH += $$TOP_DIR/connection $$OUT_PWD/$$TOP_DIR/connection
 
 QT += dbus
 
-wayland {
+wayland|lipstick {
     CONFIG += link_pkgconfig
     PKGCONFIG += wayland-client
 }
