@@ -3,9 +3,8 @@ Name:       maliit-framework-wayland
 Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
 Version:    0.99.1
 Release:    1
-Group:      System/Libraries
-License:    LGPLv2.1
-URL:        http://gitorious.org/maliit/maliit-framework
+License:    LGPLv2
+URL:        https://github.com/maliit/framework
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   maliit-framework-wayland-inputcontext
 Requires:   qt5-qtdeclarative-import-qtquick2plugin
@@ -32,7 +31,6 @@ Core libraries of Maliit and server
 
 %package inputcontext
 Summary:    Qt5 plugin for connecting to Maliit input method server
-Group:      System/Libraries
 Requires:   %{name} = %{version}-%{release}
 Provides:   qt5-plugin-platform-inputcontext-maliit
 Obsoletes:  qt5-plugin-platform-inputcontext-maliit
@@ -44,7 +42,6 @@ to Maliit input method server
 
 %package devel
 Summary:    Maliit Framework Input Method Development Package
-Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
@@ -54,7 +51,6 @@ input method plugins using Maliit
 
 %package doc
 Summary:    Maliit Framework Documentation
-Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description doc
@@ -62,7 +58,6 @@ Documentation for the Maliit Input Method Framework
 
 %package examples
 Summary:    Maliit Framework Input Method Examples
-Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description examples
@@ -72,7 +67,6 @@ the Maliit input method framework
 
 %package tests
 Summary:    Maliit Framework Input Method Tests Package
-Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description tests
@@ -107,6 +101,8 @@ install -D -m 0644 maliit-server.sh %{buildroot}%{_sysconfdir}/profile.d/maliit-
 install -D -m 0644 maliit-server.service %{buildroot}%{_libdir}/systemd/user/maliit-server.service
 mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
 ln -s ../maliit-server.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+mkdir %{buildroot}%{_libdir}/maliit
+mkdir %{buildroot}%{_datadir}/maliit
 
 
 %fdupes  %{buildroot}/%{_libdir}
@@ -117,12 +113,15 @@ ln -s ../maliit-server.service %{buildroot}%{_libdir}/systemd/user/user-session.
 
 %files
 %defattr(-,root,root,-)
+%license maliit-framework/LICENSE.LGPL
 %{_bindir}/maliit-server
 %{_libdir}/libmaliit-plugins.so*
 %{_datadir}/dbus-1/services/org.maliit.server.service
 %config %{_sysconfdir}/profile.d/maliit-server.sh
 %{_libdir}/systemd/user/maliit-server.service
 %{_libdir}/systemd/user/user-session.target.wants/maliit-server.service
+%dir %{_libdir}/maliit
+%dir %{_datadir}/maliit
 
 %files inputcontext
 %defattr(-,root,root,-)
