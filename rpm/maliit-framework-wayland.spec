@@ -17,9 +17,9 @@ BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libudev)
+BuildRequires:  pkgconfig(mce)
 BuildRequires:  fdupes
 BuildRequires:  pkgconfig(qt5-boostable)
-BuildRequires:  pkgconfig(contextkit-statefs)
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
 Conflicts:   maliit-framework-x11
@@ -87,7 +87,7 @@ pushd maliit-framework
     CONFIG+=qt5-inputcontext \
     CONFIG+=lipstick \
     CONFIG+=noxcb \
-    CONFIG+=enable-contextkit
+    CONFIG+=enable-mce
 
 make %{?jobs:-j%jobs}
 popd
