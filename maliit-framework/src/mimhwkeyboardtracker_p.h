@@ -18,14 +18,13 @@
 #define MIMHWKEYBOARDTRACKER_P_H
 
 #include <QFile>
+#include <QScopedPointer>
+#include <QDBusPendingCallWatcher>
+
+#include "mimsettings.h"
 
 #ifdef HAVE_CONTEXTSUBSCRIBER
-#include <QScopedPointer>
 #include <contextproperty.h>
-#else
-# ifdef Q_WS_MAEMO_5
-#  include "mimsettings.h"
-# endif
 #endif
 
 class MImHwKeyboardTracker;
@@ -39,8 +38,17 @@ public:
     explicit MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q_ptr);
     ~MImHwKeyboardTrackerPrivate();
 
+#ifdef HAVE_UDEV
     void detectEvdev();
     void tryEvdevDevice(const char *device);
+    QFile *evdevFile;
+    int evdevTabletModePending;
+    bool evdevTabletMode;
+#endif
+
+#ifdef HAVE_MCE
+    bool keyboardOpened;
+#endif
 
 #ifdef HAVE_CONTEXTSUBSCRIBER
     QScopedPointer<ContextProperty> keyboardOpenProperty;
@@ -48,14 +56,17 @@ public:
     MImSettings keyboardOpenConf;
 #endif
 
-    QFile *evdevFile;
-    int evdevTabletModePending;
-    bool evdevTabletMode;
-
     bool present;
 
 public Q_SLOTS:
+#ifdef HAVE_UDEV
     void evdevEvent();
+#endif
+
+#ifdef HAVE_MCE
+    void mceKeyboardStateChanged(const QString &value);
+    void handleMceKeyboardReply(QDBusPendingCallWatcher*);
+#endif
 
 Q_SIGNALS:
     void stateChanged();

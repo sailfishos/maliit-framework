@@ -115,12 +115,16 @@ QUICK_SOURCES += \
     SERVER_HEADERS_PRIVATE += mimhwkeyboardtracker_p.h
     SERVER_SOURCES += mimhwkeyboardtracker.cpp
 
-    enable-contextkit {
+    enable-mce {
+        PKGCONFIG += mce
+        DEFINES += HAVE_MCE
+    } else:enable-contextkit {
         PKGCONFIG += contextsubscriber-1.0
         DEFINES += HAVE_CONTEXTSUBSCRIBER
     } else {
         # libudev needed by non-contextkit MImHwKeyboardTracker
         PKGCONFIG += libudev
+        DEFINES += HAVE_UDEV
     }
 } else {
     SERVER_SOURCES += mimhwkeyboardtracker_stub.cpp
