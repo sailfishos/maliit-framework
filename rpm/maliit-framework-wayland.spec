@@ -20,6 +20,7 @@ BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(mce)
 BuildRequires:  fdupes
 BuildRequires:  pkgconfig(qt5-boostable)
+BuildRequires:  systemd
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
 Conflicts:   maliit-framework-x11
@@ -89,7 +90,7 @@ pushd maliit-framework
     CONFIG+=noxcb \
     CONFIG+=enable-mce
 
-make %{?jobs:-j%jobs}
+%make_build
 popd
 
 %install
@@ -98,9 +99,9 @@ pushd maliit-framework
 %qmake_install
 popd
 install -D -m 0644 maliit-server.sh %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
-install -D -m 0644 maliit-server.service %{buildroot}%{_libdir}/systemd/user/maliit-server.service
-mkdir -p %{buildroot}%{_libdir}/systemd/user/user-session.target.wants
-ln -s ../maliit-server.service %{buildroot}%{_libdir}/systemd/user/user-session.target.wants/
+install -D -m 0644 maliit-server.service %{buildroot}%{_userunitdir}/maliit-server.service
+mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
+ln -s ../maliit-server.service %{buildroot}%{_userunitdir}/user-session.target.wants/
 mkdir %{buildroot}%{_libdir}/maliit
 mkdir %{buildroot}%{_datadir}/maliit
 
@@ -118,8 +119,8 @@ mkdir %{buildroot}%{_datadir}/maliit
 %{_libdir}/libmaliit-plugins.so*
 %{_datadir}/dbus-1/services/org.maliit.server.service
 %config %{_sysconfdir}/profile.d/maliit-server.sh
-%{_libdir}/systemd/user/maliit-server.service
-%{_libdir}/systemd/user/user-session.target.wants/maliit-server.service
+%{_userunitdir}/maliit-server.service
+%{_userunitdir}/user-session.target.wants/maliit-server.service
 %dir %{_libdir}/maliit
 %dir %{_datadir}/maliit
 
