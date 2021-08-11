@@ -1,5 +1,5 @@
 [D-BUS Service]
 Name=org.maliit.server
-Exec=/usr/bin/invoker --type=qt5 @BINDIR@/maliit-server @MALIIT_SERVER_ARGUMENTS@
+Exec=/bin/false
 SystemdService=maliit-server.service
 
