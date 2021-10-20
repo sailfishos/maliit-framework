@@ -18,9 +18,9 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(mce)
-BuildRequires:  fdupes
+BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(qt5-boostable)
-BuildRequires:  systemd
+BuildRequires:  fdupes
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
 Conflicts:   maliit-framework-x11
