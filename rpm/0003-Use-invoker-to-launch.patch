@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jollamobile.com>
 Date: Wed, 29 Oct 2014 11:50:12 +0200
-Subject: [PATCH] [maliit-framework] Use invoker to launch
+Subject: [PATCH] Use invoker to launch
 
 Saving a bit of memory
 ---

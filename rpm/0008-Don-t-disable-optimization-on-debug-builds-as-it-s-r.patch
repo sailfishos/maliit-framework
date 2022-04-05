@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Andrew Branson <andrew.branson@jollamobile.com>
 Date: Thu, 21 Feb 2019 11:33:27 +0100
-Subject: [PATCH] [gcc] Don't disable optimization on debug builds as it's
- required for _FORTIFY_SOURCE. Fixes JB#44874
+Subject: [PATCH] Don't disable optimization on debug builds as it's required
+ for _FORTIFY_SOURCE. Fixes JB#44874
 
 ---
  config.pri | 4 ++--

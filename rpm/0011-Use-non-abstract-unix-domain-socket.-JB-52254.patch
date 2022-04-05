@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Simo Piiroinen <simo.piiroinen@jolla.com>
 Date: Wed, 31 Mar 2021 14:49:33 +0300
-Subject: [PATCH] [maliit] Use non-abstract unix domain socket. JB#52254
+Subject: [PATCH] Use non-abstract unix domain socket. JB#52254
 
 Abstract unix socket paths are problematic from firejail
 sandboxing point of view as bind and connect must happen

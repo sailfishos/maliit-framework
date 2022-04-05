@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Andrew den Exter <andrew.den.exter@jolla.com>
 Date: Wed, 1 Aug 2018 14:00:09 +1000
-Subject: [PATCH] [maliit] Don't block touch events outside the visible part of
- the keyboard. Contributes to JB#42563
+Subject: [PATCH] Don't block touch events outside the visible part of the
+ keyboard. Contributes to JB#42563
 
 A window surface may be created and destroyed many times over the
 lifetime of a window so we need to react to the creation to set

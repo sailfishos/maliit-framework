@@ -25,20 +25,20 @@ Provides:   maliit-framework
 
 Source1: maliit-server.sh
 Source2: maliit-server.service
+Source3: tests.xml.in
 
-Patch1:  0001-add-tests.xml.patch
-Patch2:  0002-enable-systemd-activation.patch
-Patch3:  0003-lipstick-platform.patch
-Patch4:  0004-maliit-framework-Use-invoker-to-launch.patch
-Patch5:  0005-Remove-optimization-not-to-follow-keyboard-state-if-.patch
-Patch6:  0006-maliit-Guard-all-udev-usage-with-ifndef-HAVE_CONTEXT.patch
-Patch7:  0007-maliit-framework-Don-t-crash-if-Qt-focus-handling-ge.patch
-Patch8:  0008-maliit-Don-t-block-touch-events-outside-the-visible-.patch
-Patch9:  0009-gcc-Don-t-disable-optimization-on-debug-builds-as-it.patch
-Patch10: 0010-maliit-Forward-arbitrary-extension-properties-to-QML.patch
-Patch11: 0011-maliit-framework-Use-mce-for-keyboard-state.-Fixes-J.patch
-Patch12: 0012-maliit-Use-non-abstract-unix-domain-socket.-JB-52254.patch
-Patch13: 0013-maliit-Allow-D-Bus-activation-only-through-systemd.-.patch
+Patch1: 0001-enable-systemd-activation.patch
+Patch2: 0002-lipstick-platform.patch
+Patch3: 0003-Use-invoker-to-launch.patch
+Patch4: 0004-Remove-optimization-not-to-follow-keyboard-state-if-.patch
+Patch5: 0005-Guard-all-udev-usage-with-ifndef-HAVE_CONTEXTSUBSCRI.patch
+Patch6: 0006-Don-t-crash-if-Qt-focus-handling-gets-into-bad-state.patch
+Patch7: 0007-Don-t-block-touch-events-outside-the-visible-part-of.patch
+Patch8: 0008-Don-t-disable-optimization-on-debug-builds-as-it-s-r.patch
+Patch9: 0009-Forward-arbitrary-extension-properties-to-QML-input-.patch
+Patch10: 0010-Use-mce-for-keyboard-state.-Fixes-JB-48910.patch
+Patch11: 0011-Use-non-abstract-unix-domain-socket.-JB-52254.patch
+Patch12: 0012-Allow-D-Bus-activation-only-through-systemd.-JB-5257.patch
 
 %description
 Core libraries of Maliit and server
@@ -108,6 +108,8 @@ mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
 ln -s ../maliit-server.service %{buildroot}%{_userunitdir}/user-session.target.wants/
 mkdir %{buildroot}%{_libdir}/maliit
 mkdir %{buildroot}%{_datadir}/maliit
+install -D -m 0644 %{SOURCE3} %{buildroot}/opt/tests/maliit-framework/tests.xml
+sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/maliit-framework/tests.xml
 
 
 %post -p /sbin/ldconfig

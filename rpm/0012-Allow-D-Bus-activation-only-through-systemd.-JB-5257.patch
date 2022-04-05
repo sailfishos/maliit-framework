@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Simo Piiroinen <simo.piiroinen@jolla.com>
 Date: Wed, 11 Aug 2021 19:49:34 +0300
-Subject: [PATCH] [maliit] Allow D-Bus activation only through systemd.
- JB#52572
+Subject: [PATCH] Allow D-Bus activation only through systemd. JB#52572
 
 Starting D-Bus services should happen only via systemd. Using a dummy
 Exec line in D-Bus configuration ensures that systemd can't be bypassed.

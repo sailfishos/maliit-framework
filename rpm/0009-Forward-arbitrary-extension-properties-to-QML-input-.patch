@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Andrew den Exter <andrew.den.exter@jolla.com>
 Date: Fri, 17 May 2019 18:22:47 +1000
-Subject: [PATCH] [maliit] Forward arbitrary extension properties to QML input
- methods. Contributes to JB#45133
+Subject: [PATCH] Forward arbitrary extension properties to QML input methods.
+ Contributes to JB#45133
 
 ---
  input-context/minputcontext.cpp | 10 ++++++++++

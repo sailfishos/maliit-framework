@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Pekka Vuorela <pekka.vuorela@jolla.com>
 Date: Tue, 11 Feb 2020 15:22:53 +0200
-Subject: [PATCH] [maliit-framework] Use mce for keyboard state. Fixes JB#48910
+Subject: [PATCH] Use mce for keyboard state. Fixes JB#48910
 
 ---
  src/mimhwkeyboardtracker.cpp | 78 +++++++++++++++++++++++++++++-------
