@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Andrew den Exter <andrew.den.exter@jolla.com>
+Date: Fri, 17 May 2019 18:22:47 +1000
+Subject: [PATCH] [maliit] Forward arbitrary extension properties to QML input
+ methods. Contributes to JB#45133
+
+---
+ input-context/minputcontext.cpp | 10 ++++++++++
+ src/mimpluginmanager.cpp        |  9 ++++++++-
+ src/quick/inputmethodquick.cpp  | 30 ++++++++++++++++++++++++++++++
+ src/quick/inputmethodquick.h    |  6 +++++-
+ 4 files changed, 53 insertions(+), 2 deletions(-)
+
+diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
+index fed9d1f..db317cf 100644
+--- a/input-context/minputcontext.cpp
++++ b/input-context/minputcontext.cpp
+@@ -688,8 +688,18 @@ void MInputContext::setDetectableAutoRepeat(bool enabled)
+ 
+ QMap<QString, QVariant> MInputContext::getStateInformation() const
+ {
++    QObject * const focusObject = QGuiApplication::focusObject();
++
+     QMap<QString, QVariant> stateInformation;
+ 
++    if (focusObject) {
++        stateInformation = focusObject->property("__inputMethodExtensions").toMap();
++        stateInformation.remove(QStringLiteral("enterKeyIconSource"));
++        stateInformation.remove(QStringLiteral("enterKeyText"));
++        stateInformation.remove(QStringLiteral("enterKeyEnabled"));
++        stateInformation.remove(QStringLiteral("enterKeyHighlighted"));
++    }
++
+     stateInformation["focusState"] = inputMethodAccepted();
+ 
+     if (!inputMethodAccepted() || !qGuiApp->focusObject()) {
+diff --git a/src/mimpluginmanager.cpp b/src/mimpluginmanager.cpp
+index 6ed0799..20a98e4 100644
+--- a/src/mimpluginmanager.cpp
++++ b/src/mimpluginmanager.cpp
+@@ -1479,7 +1479,14 @@ void MIMPluginManager::handleWidgetStateChanged(unsigned int clientId,
+         if (oldState.value(iter.key()) != iter.value()) {
+             changedProperties.append(iter.key());
+         }
+-
++    }
++    for (QMap<QString, QVariant>::const_iterator iter = oldState.constBegin();
++         iter != oldState.constEnd();
++         ++iter)
++    {
++        if (!newState.contains(iter.key())) {
++            changedProperties.append(iter.key());
++        }
+     }
+ 
+     variant = newState[FocusStateAttribute];
+diff --git a/src/quick/inputmethodquick.cpp b/src/quick/inputmethodquick.cpp
+index 86d64c1..4ad5c73 100644
+--- a/src/quick/inputmethodquick.cpp
++++ b/src/quick/inputmethodquick.cpp
+@@ -19,6 +19,7 @@
+ 
+ #include <maliit/plugins/abstractinputmethodhost.h>
+ #include <maliit/plugins/keyoverride.h>
++#include <maliit/plugins/updateevent.h>
+ 
+ #include "abstractplatform.h"
+ 
+@@ -28,6 +29,7 @@
+ #include <QQmlContext>
+ #include <QQmlEngine>
+ #include <QQuickView>
++#include <QQmlPropertyMap>
+ 
+ namespace Maliit
+ {
+@@ -85,6 +87,7 @@ public:
+     bool m_autoCapitalizationEnabled;
+     bool m_hiddenText;
+     QSharedPointer<Maliit::AbstractPlatform> m_platform;
++    QScopedPointer<QQmlPropertyMap> m_extensions;
+ 
+     InputMethodQuickPrivate(MAbstractInputMethodHost *host,
+                             InputMethodQuick *im,
+@@ -546,6 +549,24 @@ QList<MAbstractInputMethod::MInputMethodSubView> InputMethodQuick::subViews(Mali
+     return sub_views;
+ }
+ 
++bool InputMethodQuick::imExtensionEvent(MImExtensionEvent *event)
++{
++    Q_D(InputMethodQuick);
++
++    if (event->type() == MImExtensionEvent::Update && d->m_extensions) {
++        const QStringList keys = d->m_extensions->keys();
++        MImUpdateEvent * const update = static_cast<MImUpdateEvent *>(event);
++        for (const QString &property : update->propertiesChanged()) {
++            d->m_extensions->insert(property, update->value(property));
++        }
++
++        if (d->m_extensions->keys() != keys) {
++            Q_EMIT extensionsChanged();
++        }
++    }
++    return false;
++}
++
+ void InputMethodQuick::onSentActionKeyAttributesChanged(const QString &, const MKeyOverride::KeyOverrideAttributes changedAttributes)
+ {
+     Q_D(InputMethodQuick);
+@@ -641,4 +662,13 @@ bool InputMethodQuick::hiddenText()
+     return d->m_hiddenText;
+ }
+ 
++QObject *InputMethodQuick::extensions()
++{
++    Q_D(InputMethodQuick);
++    if (!d->m_extensions) {
++        d->m_extensions.reset(new QQmlPropertyMap);
++    }
++    return d->m_extensions.data();
++}
++
+ } // namespace Maliit
+diff --git a/src/quick/inputmethodquick.h b/src/quick/inputmethodquick.h
+index 931644e..66b339e 100644
+--- a/src/quick/inputmethodquick.h
++++ b/src/quick/inputmethodquick.h
+@@ -73,7 +73,7 @@ class InputMethodQuick
+     Q_PROPERTY(bool predictionEnabled READ predictionEnabled NOTIFY predictionEnabledChanged)
+     Q_PROPERTY(bool autoCapitalizationEnabled READ autoCapitalizationEnabled NOTIFY autoCapitalizationChanged)
+     Q_PROPERTY(bool hiddenText READ hiddenText NOTIFY hiddenTextChanged)
+-
++    Q_PROPERTY(QObject *extensions READ extensions NOTIFY extensionsChanged)
+ public:
+     //! Constructor
+     //! \param host serves as communication link to framework and application. Managed by framework.
+@@ -97,6 +97,7 @@ public:
+     virtual void setKeyOverrides(const QMap<QString, QSharedPointer<MKeyOverride> > &overrides);
+     virtual void handleFocusChange(bool focusIn);
+     QList<MAbstractInputMethod::MInputMethodSubView> subViews(Maliit::HandlerState state) const;
++    bool imExtensionEvent(MImExtensionEvent *event);
+     //! \reimp_end
+ 
+     //! Propagates screen size to QML components.
+@@ -142,6 +143,8 @@ public:
+     bool autoCapitalizationEnabled();
+     bool hiddenText();
+ 
++    QObject *extensions();
++
+ Q_SIGNALS:
+     //! Emitted when screen height changes.
+     void screenHeightChanged(int height);
+@@ -178,6 +181,7 @@ Q_SIGNALS:
+     void predictionEnabledChanged();
+     void autoCapitalizationChanged();
+     void hiddenTextChanged();
++    void extensionsChanged();
+ 
+ public Q_SLOTS:
+     //! Sends preedit string. Called by QML components. See also MAbstractInputMethodHost::sendPreeditString()
+-- 
+2.35.1
+

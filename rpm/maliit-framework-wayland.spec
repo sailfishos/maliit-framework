@@ -20,11 +20,25 @@ BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(mce)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(qt5-boostable)
-BuildRequires:  fdupes
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
-Conflicts:   maliit-framework-x11
-Obsoletes:   libmaliit-quick
+
+Source1: maliit-server.sh
+Source2: maliit-server.service
+
+Patch1:  0001-add-tests.xml.patch
+Patch2:  0002-enable-systemd-activation.patch
+Patch3:  0003-lipstick-platform.patch
+Patch4:  0004-maliit-framework-Use-invoker-to-launch.patch
+Patch5:  0005-Remove-optimization-not-to-follow-keyboard-state-if-.patch
+Patch6:  0006-maliit-Guard-all-udev-usage-with-ifndef-HAVE_CONTEXT.patch
+Patch7:  0007-maliit-framework-Don-t-crash-if-Qt-focus-handling-ge.patch
+Patch8:  0008-maliit-Don-t-block-touch-events-outside-the-visible-.patch
+Patch9:  0009-gcc-Don-t-disable-optimization-on-debug-builds-as-it.patch
+Patch10: 0010-maliit-Forward-arbitrary-extension-properties-to-QML.patch
+Patch11: 0011-maliit-framework-Use-mce-for-keyboard-state.-Fixes-J.patch
+Patch12: 0012-maliit-Use-non-abstract-unix-domain-socket.-JB-52254.patch
+Patch13: 0013-maliit-Allow-D-Bus-activation-only-through-systemd.-.patch
 
 %description
 Core libraries of Maliit and server
@@ -33,8 +47,6 @@ Core libraries of Maliit and server
 %package inputcontext
 Summary:    Qt5 plugin for connecting to Maliit input method server
 Requires:   %{name} = %{version}-%{release}
-Provides:   qt5-plugin-platform-inputcontext-maliit
-Obsoletes:  qt5-plugin-platform-inputcontext-maliit
 
 %description inputcontext
 This package contains loadable plugin for Qt5 which allows to connect
@@ -76,13 +88,9 @@ the Maliit input method framework
 
 
 %prep
-%setup -q -n %{name}-%{version}
-
-pushd maliit-framework
-popd
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-pushd maliit-framework
 %qmake5  \
     CONFIG+=enable-dbus-activation \
     CONFIG+=qt5-inputcontext \
@@ -91,22 +99,16 @@ pushd maliit-framework
     CONFIG+=enable-mce
 
 %make_build
-popd
 
 %install
-rm -rf %{buildroot}
-pushd maliit-framework
 %qmake_install
-popd
-install -D -m 0644 maliit-server.sh %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
-install -D -m 0644 maliit-server.service %{buildroot}%{_userunitdir}/maliit-server.service
+install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
+install -D -m 0644 %{SOURCE2} %{buildroot}%{_userunitdir}/maliit-server.service
 mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
 ln -s ../maliit-server.service %{buildroot}%{_userunitdir}/user-session.target.wants/
 mkdir %{buildroot}%{_libdir}/maliit
 mkdir %{buildroot}%{_datadir}/maliit
 
-
-%fdupes  %{buildroot}/%{_libdir}
 
 %post -p /sbin/ldconfig
 
@@ -114,7 +116,7 @@ mkdir %{buildroot}%{_datadir}/maliit
 
 %files
 %defattr(-,root,root,-)
-%license maliit-framework/LICENSE.LGPL
+%license LICENSE.LGPL
 %{_bindir}/maliit-server
 %{_libdir}/libmaliit-plugins.so*
 %{_datadir}/dbus-1/services/org.maliit.server.service

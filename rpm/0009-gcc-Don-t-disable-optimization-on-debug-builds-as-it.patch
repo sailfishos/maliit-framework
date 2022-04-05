@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Andrew Branson <andrew.branson@jollamobile.com>
+Date: Thu, 21 Feb 2019 11:33:27 +0100
+Subject: [PATCH] [gcc] Don't disable optimization on debug builds as it's
+ required for _FORTIFY_SOURCE. Fixes JB#44874
+
+---
+ config.pri | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/config.pri b/config.pri
+index 8f24864..3d87d35 100644
+--- a/config.pri
++++ b/config.pri
+@@ -15,8 +15,8 @@ include(defines.pri)
+ # Linker optimization for release build
+ QMAKE_LFLAGS_RELEASE+=-Wl,--as-needed
+ # Compiler warnings are error if the build type is debug
+-QMAKE_CXXFLAGS_DEBUG+=-Werror -O0
+-QMAKE_CFLAGS_DEBUG+=-Werror -O0
++QMAKE_CXXFLAGS_DEBUG+=-Werror
++QMAKE_CFLAGS_DEBUG+=-Werror
+ 
+ OBJECTS_DIR = .obj
+ MOC_DIR = .moc
+-- 
+2.35.1
+

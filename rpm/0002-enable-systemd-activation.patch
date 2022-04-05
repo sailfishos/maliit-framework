@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Reto Zingg <reto.zingg@jollamobile.com>
+Date: Mon, 30 Sep 2013 18:33:20 +0300
+Subject: [PATCH] enable systemd activation
+
+apply patch enable-systemd-activation.patch
+
+[maliit] enable systemd activation
+---
+ connection/org.maliit.server.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/connection/org.maliit.server.service.in b/connection/org.maliit.server.service.in
+index 6b38706..0726771 100644
+--- a/connection/org.maliit.server.service.in
++++ b/connection/org.maliit.server.service.in
+@@ -1,4 +1,5 @@
+ [D-BUS Service]
+ Name=org.maliit.server
+ Exec=@BINDIR@/maliit-server @MALIIT_SERVER_ARGUMENTS@
++SystemdService=maliit-server.service
+ 
+-- 
+2.35.1
+
