@@ -12,13 +12,13 @@ Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/connection/org.maliit.server.service.in b/connection/org.maliit.server.service.in
-index 45a81b3..32e2b30 100644
+index c9ba19f..32e2b30 100644
 --- a/connection/org.maliit.server.service.in
 +++ b/connection/org.maliit.server.service.in
 @@ -1,5 +1,5 @@
  [D-BUS Service]
  Name=org.maliit.server
--Exec=/usr/bin/invoker --type=qt5 @BINDIR@/maliit-server @MALIIT_SERVER_ARGUMENTS@
+-Exec=/usr/bin/invoker --type=qt5 @CMAKE_INSTALL_PREFIX@/bin/maliit-server @MALIIT_SERVER_ARGUMENTS@
 +Exec=/bin/false
  SystemdService=maliit-server.service
  

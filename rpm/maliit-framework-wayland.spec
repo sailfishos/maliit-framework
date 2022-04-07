@@ -1,7 +1,7 @@
 Name:       maliit-framework-wayland
 
 Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
-Version:    0.99.1
+Version:    2.2.1
 Release:    1
 License:    LGPLv2
 URL:        https://github.com/maliit/framework
@@ -12,14 +12,13 @@ Requires:   systemd-user-session-targets
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig(Qt5Core)
-BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Test)
-BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(mce)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(qt5-boostable)
+BuildRequires:  cmake
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
 
@@ -27,18 +26,16 @@ Source1: maliit-server.sh
 Source2: maliit-server.service
 Source3: tests.xml.in
 
-Patch1: 0001-enable-systemd-activation.patch
-Patch2: 0002-lipstick-platform.patch
-Patch3: 0003-Use-invoker-to-launch.patch
-Patch4: 0004-Remove-optimization-not-to-follow-keyboard-state-if-.patch
-Patch5: 0005-Guard-all-udev-usage-with-ifndef-HAVE_CONTEXTSUBSCRI.patch
-Patch6: 0006-Don-t-crash-if-Qt-focus-handling-gets-into-bad-state.patch
-Patch7: 0007-Don-t-block-touch-events-outside-the-visible-part-of.patch
-Patch8: 0008-Don-t-disable-optimization-on-debug-builds-as-it-s-r.patch
-Patch9: 0009-Forward-arbitrary-extension-properties-to-QML-input-.patch
-Patch10: 0010-Use-mce-for-keyboard-state.-Fixes-JB-48910.patch
-Patch11: 0011-Use-non-abstract-unix-domain-socket.-JB-52254.patch
-Patch12: 0012-Allow-D-Bus-activation-only-through-systemd.-JB-5257.patch
+Patch1: 0001-Install-unit-test-files.patch
+Patch2: 0002-enable-systemd-activation.patch
+Patch3: 0003-lipstick-platform.patch
+Patch4: 0004-Use-invoker-to-launch.patch
+Patch5: 0005-Use-mce-for-keyboard-state.-Fixes-JB-48910.patch
+Patch6: 0006-Forward-arbitrary-extension-properties-to-QML-input-.patch
+Patch7: 0007-Use-non-abstract-unix-domain-socket.-JB-52254.patch
+Patch8: 0008-Allow-D-Bus-activation-only-through-systemd.-JB-5257.patch
+Patch9: 0009-Fix-build-on-Qt-5.6.patch
+Patch10: 0010-Revert-Fix-mapping-between-screen-orientations-and-r.patch
 
 %description
 Core libraries of Maliit and server
@@ -62,22 +59,6 @@ This package contains the files necessary to develop
 input method plugins using Maliit
 
 
-%package doc
-Summary:    Maliit Framework Documentation
-Requires:   %{name} = %{version}-%{release}
-
-%description doc
-Documentation for the Maliit Input Method Framework
-
-%package examples
-Summary:    Maliit Framework Input Method Examples
-Requires:   %{name} = %{version}-%{release}
-
-%description examples
-This package contains examples applications for
-the Maliit input method framework
-
-
 %package tests
 Summary:    Maliit Framework Input Method Tests Package
 Requires:   %{name} = %{version}-%{release}
@@ -91,17 +72,22 @@ the Maliit input method framework
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-%qmake5  \
-    CONFIG+=enable-dbus-activation \
-    CONFIG+=qt5-inputcontext \
-    CONFIG+=lipstick \
-    CONFIG+=noxcb \
-    CONFIG+=enable-mce
+mkdir -p build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr \
+      -Denable-docs=OFF \
+      -Denable-glib=OFF \
+      -Denable-xcb=OFF \
+      -Denable-wayland=OFF \
+      -Denable-dbus-activation=ON \
+      ..
 
 %make_build
 
 %install
-%qmake_install
+cd build
+make install DESTDIR=%{buildroot}
+cd ..
 install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_userunitdir}/maliit-server.service
 mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
@@ -127,6 +113,7 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %{_userunitdir}/user-session.target.wants/maliit-server.service
 %dir %{_libdir}/maliit
 %dir %{_datadir}/maliit
+%exclude %{_docdir}/maliit-framework/
 
 %files inputcontext
 %defattr(-,root,root,-)
@@ -134,17 +121,10 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/maliit/*
+%{_includedir}/maliit-2/
 %{_libdir}/pkgconfig/*.pc
-%{_datadir}/qt5/mkspecs/features/*
-
-%files doc
-%defattr(-,root,root,-)
-%{_docdir}/maliit-framework/html
-
-%files examples
-%defattr(-,root,root,-)
-%{_bindir}/maliit-exampleapp-plainqt
+%{_libdir}/qt5/mkspecs/features/*
+%{_libdir}/cmake/MaliitPlugins/
 
 %files tests
 %defattr(-,root,root,-)

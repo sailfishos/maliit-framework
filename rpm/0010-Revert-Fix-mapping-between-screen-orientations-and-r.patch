@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Thu, 7 Apr 2022 16:25:40 +0300
+Subject: [PATCH] Revert "Fix mapping between screen orientations and rotation
+ angles."
+
+The commit there changes the convention of orientation, switching from
+clockwise rotation to counter-clockwise. Might be even otherwise broken.
+
+This reverts commit b9f448fcccd1200f76a5497daf40a6195fe6d465.
+---
+ input-context/minputcontext.cpp | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
+index b95a195..f49b5d7 100644
+--- a/input-context/minputcontext.cpp
++++ b/input-context/minputcontext.cpp
+@@ -24,7 +24,6 @@
+ #include <QDebug>
+ #include <QByteArray>
+ #include <QRectF>
+-#include <QScreen>
+ #include <QLocale>
+ #include <QWindow>
+ #include <QSharedDataPointer>
+@@ -47,8 +46,22 @@ namespace
+ 
+     int orientationAngle(Qt::ScreenOrientation orientation)
+     {
+-        QScreen *screen = qGuiApp->primaryScreen();
+-        return screen->angleBetween(screen->primaryOrientation(), orientation);
++        // Maliit uses orientations relative to screen, Qt relative to world
++        // Note: doesn't work with inverted portrait or landscape as native screen orientation.
++        static bool portraitRotated = qGuiApp->primaryScreen()->primaryOrientation() == Qt::PortraitOrientation;
++
++        switch (orientation) {
++        case Qt::PrimaryOrientation: // Urgh.
++        case Qt::PortraitOrientation:
++            return portraitRotated ? MInputContext::Angle0 : MInputContext::Angle270;
++        case Qt::LandscapeOrientation:
++            return portraitRotated ? MInputContext::Angle90 : MInputContext::Angle0;
++        case Qt::InvertedPortraitOrientation:
++            return portraitRotated ? MInputContext::Angle180 : MInputContext::Angle90;
++        case Qt::InvertedLandscapeOrientation:
++            return portraitRotated ? MInputContext::Angle270 : MInputContext::Angle180;
++        }
++        return MInputContext::Angle0;
+     }
+ }
+ 
+-- 
+2.35.1
+

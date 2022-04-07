@@ -1,0 +1,198 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Reto Zingg <reto.zingg@jollamobile.com>
+Date: Mon, 30 Sep 2013 18:59:03 +0300
+Subject: [PATCH] lipstick platform
+
+the following patch is not required for X11, but should not change
+behaviour when applied. We need to apply it due to the way our git
+packaging and QA process work -- without applying it X11 maliit
+won't pass automatic QA due to unused files in the packaging
+directory
+
+[maliit] add lipstick_platform.patch
+---
+ CMakeLists.txt           |  8 ++++
+ src/abstractplatform.cpp |  6 +++
+ src/lipstickplatform.cpp | 82 ++++++++++++++++++++++++++++++++++++++++
+ src/lipstickplatform.h   | 30 +++++++++++++++
+ 4 files changed, 126 insertions(+)
+ create mode 100644 src/lipstickplatform.cpp
+ create mode 100644 src/lipstickplatform.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a1cebdd..23f7aa8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,6 +14,7 @@ option(enable-xcb "Compile with xcb support" ON)
+ option(enable-wayland "Compile with support for wayland" ON)
+ option(enable-wayland-gtk "Compile with support for wayland gtk+" OFF)
+ option(enable-qt5-inputcontext "Compile with Qt 5 input context" ON)
++option(enable-lipstick "Compile with Lipstick integration support" ON)
+ 
+ option(enable-hwkeyboard "Enable support for the hardware keyboard" ON)
+ option(enable-dbus-activation "Enable dbus activation support for maliit-server" OFF)
+@@ -204,6 +205,13 @@ if(enable-wayland)
+ 
+ endif()
+ 
++if(enable-lipstick)
++    list(APPEND PLUGINS_SOURCES
++         src/lipstickplatform.cpp
++         src/lipstickplatform.h)
++    add_definitions(-DHAVE_LIPSTICK)
++endif()
++
+ if(enable-hwkeyboard)
+     list(APPEND PLUGINS_SOURCES
+          src/mimhwkeyboardtracker.cpp
+diff --git a/src/abstractplatform.cpp b/src/abstractplatform.cpp
+index 0b01e66..5d2c380 100644
+--- a/src/abstractplatform.cpp
++++ b/src/abstractplatform.cpp
+@@ -20,6 +20,9 @@
+ #ifdef HAVE_WAYLAND
+ #include "waylandplatform.h"
+ #endif
++#ifdef HAVE_LIPSTICK
++#include "lipstickplatform.h"
++#endif
+ 
+ namespace Maliit
+ {
+@@ -35,6 +38,9 @@ void AbstractPlatform::setApplicationWindow(QWindow *window, WId appWindowId)
+ 
+ std::unique_ptr<AbstractPlatform> createPlatform()
+ {
++#ifdef HAVE_LIPSTICK
++    return std::unique_ptr<Maliit::AbstractPlatform>(new Maliit::LipstickPlatform);
++#endif
+ #ifdef HAVE_WAYLAND
+     if (QGuiApplication::platformName().startsWith("wayland")) {
+         return std::unique_ptr<AbstractPlatform>(new Maliit::WaylandPlatform);
+diff --git a/src/lipstickplatform.cpp b/src/lipstickplatform.cpp
+new file mode 100644
+index 0000000..4975879
+--- /dev/null
++++ b/src/lipstickplatform.cpp
+@@ -0,0 +1,82 @@
++/* * This file is part of Maliit framework *
++ *
++ * Copyright (C) 2013 Jolla Ltd.
++ *
++ * Contact: maliit-discuss@lists.maliit.org
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2.1 as published by the Free Software Foundation
++ * and appearing in the file LICENSE.LGPL included in the packaging
++ * of this file.
++ */
++
++#include "lipstickplatform.h"
++
++#include <QGuiApplication>
++#include <QPlatformSurfaceEvent>
++#include <qpa/qplatformnativeinterface.h>
++
++namespace Maliit
++{
++
++class LipstickWindowPropertyBroadcaster : public QObject
++{
++public:
++    LipstickWindowPropertyBroadcaster(QWindow *window)
++        : QObject(window)
++        , m_window(window)
++    {
++        m_window->installEventFilter(this);
++    }
++
++    bool eventFilter(QObject *object, QEvent *event)
++    {
++        if (object != m_window) {
++            return false;
++        } else switch (event->type()) {
++        case QEvent::PlatformSurface: {
++            QPlatformSurfaceEvent *platformEvent = static_cast<QPlatformSurfaceEvent *>(event);
++
++            if (QPlatformWindow *handle = platformEvent->surfaceEventType() == QPlatformSurfaceEvent::SurfaceCreated
++                    ? m_window->handle()
++                    : nullptr) {
++                QPlatformNativeInterface *native = QGuiApplication::platformNativeInterface();
++
++                native->setWindowProperty(handle, QStringLiteral("CATEGORY"), QStringLiteral("overlay"));
++                native->setWindowProperty(handle, QStringLiteral("MOUSE_REGION"), m_window->property("MOUSE_REGION"));
++            }
++            return false;
++        }
++        case QEvent::DynamicPropertyChange: {
++            QDynamicPropertyChangeEvent *propertyEvent = static_cast<QDynamicPropertyChangeEvent *>(event);
++            if (QPlatformWindow *handle = propertyEvent->propertyName() == "MOUSE_REGION"
++                    ? m_window->handle()
++                    : nullptr) {
++                QPlatformNativeInterface *native = QGuiApplication::platformNativeInterface();
++
++                native->setWindowProperty(handle, QStringLiteral("MOUSE_REGION"), m_window->property("MOUSE_REGION"));
++            }
++            return false;
++        }
++        default:
++            return false;
++        }
++    }
++
++private:
++    QWindow * const m_window;
++};
++
++void LipstickPlatform::setupInputPanel(QWindow* window, Maliit::Position)
++{
++    new LipstickWindowPropertyBroadcaster(window);
++}
++
++void LipstickPlatform::setInputRegion(QWindow* window, const QRegion& region)
++{
++    window->setProperty("MOUSE_REGION", region);
++    window->setMask(region);
++}
++
++} // namespace Maliit
+diff --git a/src/lipstickplatform.h b/src/lipstickplatform.h
+new file mode 100644
+index 0000000..226551a
+--- /dev/null
++++ b/src/lipstickplatform.h
+@@ -0,0 +1,30 @@
++/* * This file is part of Maliit framework *
++ *
++ * Copyright (C) 2013 Jolla Ltd.
++ *
++ * Contact: maliit-discuss@lists.maliit.org
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2.1 as published by the Free Software Foundation
++ * and appearing in the file LICENSE.LGPL included in the packaging
++ * of this file.
++ */
++
++#ifndef MALIIT_LIPSTICK_PLATFORM_H
++#define MALIIT_LIPSTICK_PLATFORM_H
++
++#include "abstractplatform.h"
++
++namespace Maliit
++{
++
++class LipstickPlatform : public AbstractPlatform
++{
++    virtual void setupInputPanel(QWindow* window, Maliit::Position position);
++    virtual void setInputRegion(QWindow* window, const QRegion& region);
++};
++
++} // namespace Maliit
++
++#endif // MALIIT_UNKNOWN_PLATFORM_H
+-- 
+2.35.1
+
