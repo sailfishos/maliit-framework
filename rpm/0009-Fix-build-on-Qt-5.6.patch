@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pekka Vuorela <pekka.vuorela@jolla.com>
+Date: Thu, 7 Apr 2022 12:56:28 +0300
+Subject: [PATCH] Fix build on Qt 5.6
+
+The compose plugin as fallback not available even on sailfish.
+---
+ input-context/minputcontext.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
+index d1f49d4..b95a195 100644
+--- a/input-context/minputcontext.cpp
++++ b/input-context/minputcontext.cpp
+@@ -62,8 +62,12 @@ MInputContext::MInputContext()
+       preeditCursorPos(-1),
+       redirectKeys(false),
+       currentFocusAcceptsInput(false),
++#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+       composeInputContext(qLoadPlugin<QPlatformInputContext, QPlatformInputContextPlugin>
+                           (loader(), "compose", QStringList()))
++#else
++      composeInputContext(nullptr)
++#endif
+ {
+     QByteArray debugEnvVar = qgetenv("MALIIT_DEBUG");
+     if (!debugEnvVar.isEmpty() && debugEnvVar != "0") {
+-- 
+2.35.1
+

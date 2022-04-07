@@ -23,7 +23,7 @@ Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
  1 file changed, 34 insertions(+), 7 deletions(-)
 
 diff --git a/connection/serverdbusaddress.cpp b/connection/serverdbusaddress.cpp
-index b80a174..7aa5732 100644
+index 67fe0a2..64c0307 100644
 --- a/connection/serverdbusaddress.cpp
 +++ b/connection/serverdbusaddress.cpp
 @@ -1,7 +1,8 @@
@@ -34,9 +34,9 @@ index b80a174..7aa5732 100644
   * All rights reserved.
 + * Copyright (c) 2021 Jolla Ltd.
   *
-  * Contact: maliit-discuss@lists.maliit.org
   *
-@@ -18,9 +19,14 @@
+  * This library is free software; you can redistribute it and/or
+@@ -17,9 +18,14 @@
  #include <QDBusConnection>
  
  #include <QDBusServer>
@@ -51,7 +51,7 @@ index b80a174..7aa5732 100644
  namespace {
      const char * const MaliitServerName = "org.maliit.server";
      const char * const MaliitServerObjectPath = "/org/maliit/server/address";
-@@ -62,12 +68,33 @@ DynamicAddress::DynamicAddress()
+@@ -61,12 +67,33 @@ DynamicAddress::DynamicAddress()
  
  QDBusServer* DynamicAddress::connect()
  {

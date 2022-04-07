@@ -12,10 +12,10 @@ Subject: [PATCH] Forward arbitrary extension properties to QML input methods.
  4 files changed, 53 insertions(+), 2 deletions(-)
 
 diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
-index fed9d1f..db317cf 100644
+index 37d77bd..d1f49d4 100644
 --- a/input-context/minputcontext.cpp
 +++ b/input-context/minputcontext.cpp
-@@ -688,8 +688,18 @@ void MInputContext::setDetectableAutoRepeat(bool enabled)
+@@ -710,8 +710,18 @@ void MInputContext::setDetectableAutoRepeat(bool enabled)
  
  QMap<QString, QVariant> MInputContext::getStateInformation() const
  {
@@ -35,10 +35,10 @@ index fed9d1f..db317cf 100644
  
      if (!inputMethodAccepted() || !qGuiApp->focusObject()) {
 diff --git a/src/mimpluginmanager.cpp b/src/mimpluginmanager.cpp
-index 6ed0799..20a98e4 100644
+index 9943aa9..2ff19a5 100644
 --- a/src/mimpluginmanager.cpp
 +++ b/src/mimpluginmanager.cpp
-@@ -1479,7 +1479,14 @@ void MIMPluginManager::handleWidgetStateChanged(unsigned int clientId,
+@@ -1478,7 +1478,14 @@ void MIMPluginManager::handleWidgetStateChanged(unsigned int clientId,
          if (oldState.value(iter.key()) != iter.value()) {
              changedProperties.append(iter.key());
          }
@@ -55,10 +55,10 @@ index 6ed0799..20a98e4 100644
  
      variant = newState[FocusStateAttribute];
 diff --git a/src/quick/inputmethodquick.cpp b/src/quick/inputmethodquick.cpp
-index 86d64c1..4ad5c73 100644
+index a80ec61..9dc03f3 100644
 --- a/src/quick/inputmethodquick.cpp
 +++ b/src/quick/inputmethodquick.cpp
-@@ -19,6 +19,7 @@
+@@ -18,6 +18,7 @@
  
  #include <maliit/plugins/abstractinputmethodhost.h>
  #include <maliit/plugins/keyoverride.h>
@@ -66,7 +66,7 @@ index 86d64c1..4ad5c73 100644
  
  #include "abstractplatform.h"
  
-@@ -28,6 +29,7 @@
+@@ -27,6 +28,7 @@
  #include <QQmlContext>
  #include <QQmlEngine>
  #include <QQuickView>
@@ -74,7 +74,7 @@ index 86d64c1..4ad5c73 100644
  
  namespace Maliit
  {
-@@ -85,6 +87,7 @@ public:
+@@ -84,6 +86,7 @@ public:
      bool m_autoCapitalizationEnabled;
      bool m_hiddenText;
      QSharedPointer<Maliit::AbstractPlatform> m_platform;
@@ -82,7 +82,7 @@ index 86d64c1..4ad5c73 100644
  
      InputMethodQuickPrivate(MAbstractInputMethodHost *host,
                              InputMethodQuick *im,
-@@ -546,6 +549,24 @@ QList<MAbstractInputMethod::MInputMethodSubView> InputMethodQuick::subViews(Mali
+@@ -545,6 +548,24 @@ QList<MAbstractInputMethod::MInputMethodSubView> InputMethodQuick::subViews(Mali
      return sub_views;
  }
  
@@ -107,7 +107,7 @@ index 86d64c1..4ad5c73 100644
  void InputMethodQuick::onSentActionKeyAttributesChanged(const QString &, const MKeyOverride::KeyOverrideAttributes changedAttributes)
  {
      Q_D(InputMethodQuick);
-@@ -641,4 +662,13 @@ bool InputMethodQuick::hiddenText()
+@@ -640,4 +661,13 @@ bool InputMethodQuick::hiddenText()
      return d->m_hiddenText;
  }
  
@@ -122,10 +122,10 @@ index 86d64c1..4ad5c73 100644
 +
  } // namespace Maliit
 diff --git a/src/quick/inputmethodquick.h b/src/quick/inputmethodquick.h
-index 931644e..66b339e 100644
+index 1a1af47..881511a 100644
 --- a/src/quick/inputmethodquick.h
 +++ b/src/quick/inputmethodquick.h
-@@ -73,7 +73,7 @@ class InputMethodQuick
+@@ -72,7 +72,7 @@ class InputMethodQuick
      Q_PROPERTY(bool predictionEnabled READ predictionEnabled NOTIFY predictionEnabledChanged)
      Q_PROPERTY(bool autoCapitalizationEnabled READ autoCapitalizationEnabled NOTIFY autoCapitalizationChanged)
      Q_PROPERTY(bool hiddenText READ hiddenText NOTIFY hiddenTextChanged)
@@ -134,7 +134,7 @@ index 931644e..66b339e 100644
  public:
      //! Constructor
      //! \param host serves as communication link to framework and application. Managed by framework.
-@@ -97,6 +97,7 @@ public:
+@@ -96,6 +96,7 @@ public:
      virtual void setKeyOverrides(const QMap<QString, QSharedPointer<MKeyOverride> > &overrides);
      virtual void handleFocusChange(bool focusIn);
      QList<MAbstractInputMethod::MInputMethodSubView> subViews(Maliit::HandlerState state) const;
@@ -142,7 +142,7 @@ index 931644e..66b339e 100644
      //! \reimp_end
  
      //! Propagates screen size to QML components.
-@@ -142,6 +143,8 @@ public:
+@@ -141,6 +142,8 @@ public:
      bool autoCapitalizationEnabled();
      bool hiddenText();
  
@@ -151,7 +151,7 @@ index 931644e..66b339e 100644
  Q_SIGNALS:
      //! Emitted when screen height changes.
      void screenHeightChanged(int height);
-@@ -178,6 +181,7 @@ Q_SIGNALS:
+@@ -177,6 +180,7 @@ Q_SIGNALS:
      void predictionEnabledChanged();
      void autoCapitalizationChanged();
      void hiddenTextChanged();
