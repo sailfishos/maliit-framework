@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Simo Piiroinen <simo.piiroinen@jolla.com>
+Date: Wed, 11 Aug 2021 19:49:34 +0300
+Subject: [PATCH] Allow D-Bus activation only through systemd. JB#52572
+
+Starting D-Bus services should happen only via systemd. Using a dummy
+Exec line in D-Bus configuration ensures that systemd can't be bypassed.
+
+Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
+---
+ connection/org.maliit.server.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/connection/org.maliit.server.service.in b/connection/org.maliit.server.service.in
+index c9ba19f..32e2b30 100644
+--- a/connection/org.maliit.server.service.in
++++ b/connection/org.maliit.server.service.in
+@@ -1,5 +1,5 @@
+ [D-BUS Service]
+ Name=org.maliit.server
+-Exec=/usr/bin/invoker --type=qt5 @CMAKE_INSTALL_PREFIX@/bin/maliit-server @MALIIT_SERVER_ARGUMENTS@
++Exec=/bin/false
+ SystemdService=maliit-server.service
+ 
+-- 
+2.35.1
+
