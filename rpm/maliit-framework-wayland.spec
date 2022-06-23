@@ -4,7 +4,7 @@ Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
 Version:    2.2.1
 Release:    1
 License:    LGPLv2
-URL:        https://github.com/maliit/framework
+URL:        https://github.com/sailfishos/maliit-framework
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   maliit-framework-wayland-inputcontext
 Requires:   qt5-qtdeclarative-import-qtquick2plugin
