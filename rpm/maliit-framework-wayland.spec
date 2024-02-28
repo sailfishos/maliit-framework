@@ -18,6 +18,8 @@ BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(mce)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(qt5-boostable)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  cmake
 Requires:   mapplauncherd-qt5
 Provides:   maliit-framework
@@ -55,6 +57,7 @@ to Maliit input method server
 %package devel
 Summary:    Maliit Framework Input Method Development Package
 Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-glib = %{version}-%{release}
 
 %description devel
 This package contains the files necessary to develop
@@ -70,6 +73,14 @@ This package contains the files necessary to test
 the Maliit input method framework
 
 
+%package glib
+Summary:    Maliit Framework Input Method Glib Package
+Requires:   %{name} = %{version}-%{release}
+
+%description glib
+This package contains the files necessary to use
+maliit keyboard via glib apis
+
 %prep
 %autosetup -p1 -n %{name}-%{version}/upstream
 
@@ -78,7 +89,7 @@ mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -Denable-docs=OFF \
-      -Denable-glib=OFF \
+      -Denable-glib=ON \
       -Denable-xcb=OFF \
       -Denable-wayland=OFF \
       -Denable-dbus-activation=ON \
@@ -117,6 +128,9 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %dir %{_datadir}/maliit
 %exclude %{_docdir}/maliit-framework/
 
+%files glib
+%{_libdir}/libmaliit-glib.so.*
+
 %files inputcontext
 %defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/platforminputcontexts/*.so
@@ -128,6 +142,8 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/qt5/mkspecs/features/*
 %{_libdir}/cmake/MaliitPlugins/
+%{_libdir}/cmake/MaliitGLib/
+%{_libdir}/libmaliit-glib.so
 
 %files tests
 %defattr(-,root,root,-)
