@@ -1,9 +1,13 @@
+# Out of tree builds are not default at the moment
+# Remove this line when it is the default
+%undefine __cmake_in_source_build
+
 Name:       maliit-framework-wayland
 
 Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
 Version:    2.2.1
 Release:    1
-License:    LGPLv2
+License:    LGPL-2.0
 URL:        https://github.com/sailfishos/maliit-framework
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   maliit-framework-wayland-inputcontext
@@ -85,22 +89,17 @@ maliit keyboard via glib apis
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-mkdir -p build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr \
+%cmake \
       -Denable-docs=OFF \
       -Denable-glib=ON \
       -Denable-xcb=OFF \
       -Denable-wayland=OFF \
       -Denable-dbus-activation=ON \
-      ..
-
-%make_build
+      %{nil}
+%cmake_build
 
 %install
-cd build
-make install DESTDIR=%{buildroot}
-cd ..
+%cmake_install
 install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_userunitdir}/maliit-server.service
 mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
