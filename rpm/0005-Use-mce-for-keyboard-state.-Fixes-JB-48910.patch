@@ -4,13 +4,13 @@ Date: Mon, 4 May 2015 17:20:52 +0300
 Subject: [PATCH] Use mce for keyboard state. Fixes JB#48910
 
 ---
- CMakeLists.txt               | 12 +++++-
- src/mimhwkeyboardtracker.cpp | 80 ++++++++++++++++++++++++++++++------
- src/mimhwkeyboardtracker_p.h | 29 +++++++++----
- 3 files changed, 97 insertions(+), 24 deletions(-)
+ CMakeLists.txt               | 12 +++++--
+ src/mimhwkeyboardtracker.cpp | 70 ++++++++++++++++++++++++++++++++++--
+ src/mimhwkeyboardtracker_p.h | 17 +++++++++
+ 3 files changed, 95 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7424f04..82faf70 100644
+index 4ce3f9ec81345426c3131a1081b6b91938983095..0120de848ffc9363f6d5ad2b8a3347928556a81c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -18,6 +18,7 @@ option(enable-lipstick "Compile with Lipstick integration support" ON)
@@ -21,7 +21,7 @@ index 7424f04..82faf70 100644
  
  # Install paths
  include(GNUInstallDirs)
-@@ -216,8 +217,9 @@ if(enable-hwkeyboard)
+@@ -212,8 +213,9 @@ if(enable-hwkeyboard)
      list(APPEND PLUGINS_SOURCES
           src/mimhwkeyboardtracker.cpp
           src/mimhwkeyboardtracker_p.h)
@@ -33,7 +33,7 @@ index 7424f04..82faf70 100644
  else()
      list(APPEND PLUGINS_SOURCES src/mimhwkeyboardtracker_stub.cpp)
  endif()
-@@ -231,6 +233,12 @@ set_target_properties(maliit-plugins PROPERTIES SOVERSION ${PROJECT_VERSION_MAJO
+@@ -227,6 +229,12 @@ set_target_properties(maliit-plugins PROPERTIES SOVERSION ${PROJECT_VERSION_MAJO
          VERSION ${PROJECT_VERSION}
          EXPORT_NAME Maliit::Plugins)
  
@@ -47,7 +47,7 @@ index 7424f04..82faf70 100644
      find_package(GLib2)
      find_package(GIO)
 diff --git a/src/mimhwkeyboardtracker.cpp b/src/mimhwkeyboardtracker.cpp
-index 0b7c948..18b6e43 100644
+index d793ea06459825627d29276c8b6914cefc4e3706..30b80876b89d2ebe285dc8d95eaad9a23a556301 100644
 --- a/src/mimhwkeyboardtracker.cpp
 +++ b/src/mimhwkeyboardtracker.cpp
 @@ -16,9 +16,21 @@
@@ -72,24 +72,17 @@ index 0b7c948..18b6e43 100644
  
  #include "mimhwkeyboardtracker.h"
  #include "mimhwkeyboardtracker_p.h"
-@@ -33,22 +45,33 @@ namespace {
- }
+@@ -28,17 +40,38 @@
+ #define TEST_BIT(bit, array) (array[(bit) / 8] & (1 << (bit) % 8))
  
  MImHwKeyboardTrackerPrivate::MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q_ptr) :
--#ifdef HAVE_CONTEXTSUBSCRIBER
--    keyboardOpenProperty(),
--#elif defined(Q_WS_MAEMO_5)
-+#if defined(Q_WS_MAEMO_5)
-     keyboardOpenConf("/system/osso/af/slide-open"),
--#else
-+#elif HAVE_UDEV
++#ifdef HAVE_UDEV
      evdevTabletModePending(-1),
      evdevTabletMode(0),
- #endif
++#endif
      present(false)
  {
--#ifdef HAVE_CONTEXTSUBSCRIBER
--    ContextProperty keyboardPresentProperty(keyboardPresent);
++
 +#ifdef HAVE_MCE
 +    present = true; // includes external, always true
 +    keyboardOpened = false;
@@ -105,35 +98,22 @@ index 0b7c948..18b6e43 100644
 +                                         MCE_HARDWARE_KEYBOARD_STATE_SIG,
 +                                         this, SLOT(mceKeyboardStateChanged(QString)));
 +
-+#elif defined(HAVE_CONTEXTSUBSCRIBER)
-     keyboardOpenProperty.reset(new ContextProperty(keyboardOpen));
--    keyboardPresentProperty.waitForSubscription(true);
-     keyboardOpenProperty->waitForSubscription(true);
--    present = keyboardPresentProperty.value().toBool();
-+    present = true; // assume keyboard present as context property currently includes also external keyboards
-     if (present) {
-         QObject::connect(keyboardOpenProperty.data(), SIGNAL(valueChanged()),
-                          q_ptr, SIGNAL(stateChanged()));
-@@ -60,14 +83,14 @@ MImHwKeyboardTrackerPrivate::MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q
-     QObject::connect(&keyboardOpenConf, SIGNAL(valueChanged()),
-                      q_ptr, SIGNAL(stateChanged()));
- #else
--    Q_UNUSED(q_ptr);
--    QObject::connect(this, SIGNAL(stateChanged()),
--                     q_ptr, SIGNAL(stateChanged()));
--
-     detectEvdev();
- #endif
++#else
++    detectEvdev();
++#endif
 +
-+    QObject::connect(this, SIGNAL(stateChanged()),
-+                     q_ptr, SIGNAL(stateChanged()));
+     Q_UNUSED(q_ptr);
+     QObject::connect(this, SIGNAL(stateChanged()),
+                      q_ptr, SIGNAL(stateChanged()));
+-
+-    detectEvdev();
  }
  
 +#ifdef HAVE_UDEV
  void MImHwKeyboardTrackerPrivate::detectEvdev()
  {
      // Use udev to enumerate all input devices, using evdev on each device to
-@@ -187,6 +210,35 @@ void MImHwKeyboardTrackerPrivate::tryEvdevDevice(const char *device)
+@@ -158,6 +191,35 @@ void MImHwKeyboardTrackerPrivate::tryEvdevDevice(const char *device)
  
      evdevTabletMode = TEST_BIT(SW_TABLET_MODE, state);
  }
@@ -169,22 +149,27 @@ index 0b7c948..18b6e43 100644
  
  MImHwKeyboardTrackerPrivate::~MImHwKeyboardTrackerPrivate()
  {
-@@ -217,7 +269,9 @@ bool MImHwKeyboardTracker::isOpen() const
+@@ -188,6 +250,9 @@ bool MImHwKeyboardTracker::isOpen() const
          return false;
      }
  
--#ifdef HAVE_CONTEXTSUBSCRIBER
 +#ifdef HAVE_MCE
 +    return d->keyboardOpened;
-+#elif defined(HAVE_CONTEXTSUBSCRIBER)
-     return d->keyboardOpenProperty->value().toBool();
- #elif defined(Q_WS_MAEMO_5)
-     return d->keyboardOpenConf.value().toBool();
++#else
+     // If we found a talet mode switch, we report that the hardware keyboard
+     // is available when the system is not in tablet mode (switch closed),
+     // and is not available otherwise (switch open).
+@@ -195,4 +260,5 @@ bool MImHwKeyboardTracker::isOpen() const
+         return !d->evdevTabletMode;
+ 
+     return false;
++#endif
+ }
 diff --git a/src/mimhwkeyboardtracker_p.h b/src/mimhwkeyboardtracker_p.h
-index 4cf11a1..455ebed 100644
+index 0c144625d6f029fa55baa1741fd7fd52c8cb5e0e..18895816699fa019d3a1de2e81c8b5f3b5daea2b 100644
 --- a/src/mimhwkeyboardtracker_p.h
 +++ b/src/mimhwkeyboardtracker_p.h
-@@ -17,14 +17,13 @@
+@@ -17,6 +17,10 @@
  #define MIMHWKEYBOARDTRACKER_P_H
  
  #include <QFile>
@@ -193,42 +178,25 @@ index 4cf11a1..455ebed 100644
 +
 +#include "mimsettings.h"
  
- #ifdef HAVE_CONTEXTSUBSCRIBER
--#include <QScopedPointer>
- #include <contextproperty.h>
--#else
--# ifdef Q_WS_MAEMO_5
--#  include "mimsettings.h"
--# endif
- #endif
- 
  class MImHwKeyboardTracker;
-@@ -38,8 +37,17 @@ public:
+ 
+@@ -29,17 +33,30 @@ public:
      explicit MImHwKeyboardTrackerPrivate(MImHwKeyboardTracker *q_ptr);
      ~MImHwKeyboardTrackerPrivate();
  
 +#ifdef HAVE_UDEV
      void detectEvdev();
      void tryEvdevDevice(const char *device);
-+    QFile *evdevFile;
-+    int evdevTabletModePending;
-+    bool evdevTabletMode;
+ 
+     QFile *evdevFile;
+     int evdevTabletModePending;
+     bool evdevTabletMode;
 +#endif
 +
 +#ifdef HAVE_MCE
 +    bool keyboardOpened;
 +#endif
  
- #ifdef HAVE_CONTEXTSUBSCRIBER
-     QScopedPointer<ContextProperty> keyboardOpenProperty;
-@@ -47,14 +55,17 @@ public:
-     MImSettings keyboardOpenConf;
- #endif
- 
--    QFile *evdevFile;
--    int evdevTabletModePending;
--    bool evdevTabletMode;
--
      bool present;
  
  public Q_SLOTS:
@@ -243,6 +211,3 @@ index 4cf11a1..455ebed 100644
  
  Q_SIGNALS:
      void stateChanged();
--- 
-2.35.1
-

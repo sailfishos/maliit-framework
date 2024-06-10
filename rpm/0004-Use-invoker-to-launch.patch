@@ -11,10 +11,10 @@ Saving a bit of memory
  3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 23f7aa8..7424f04 100644
+index 9333aace091a314084fce2e2f423430e922daaa5..4ce3f9ec81345426c3131a1081b6b91938983095 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -299,6 +299,11 @@ add_definitions(-DMALIIT_FRAMEWORK_USE_INTERNAL_API
+@@ -295,6 +295,11 @@ add_definitions(-DMALIIT_FRAMEWORK_USE_INTERNAL_API
  add_executable(maliit-server passthroughserver/main.cpp)
  target_link_libraries(maliit-server maliit-plugins maliit-connection)
  
@@ -27,7 +27,7 @@ index 23f7aa8..7424f04 100644
      set(INPUT_CONTEXT_SOURCES
              input-context/main.cpp
 diff --git a/connection/org.maliit.server.service.in b/connection/org.maliit.server.service.in
-index f387838..c9ba19f 100644
+index f387838dcd59267e34190920a07b97951c8041f1..c9ba19fb5e7a48ae5fefba3d1f210596336873db 100644
 --- a/connection/org.maliit.server.service.in
 +++ b/connection/org.maliit.server.service.in
 @@ -1,5 +1,5 @@
@@ -38,18 +38,15 @@ index f387838..c9ba19f 100644
  SystemdService=maliit-server.service
  
 diff --git a/passthroughserver/main.cpp b/passthroughserver/main.cpp
-index 9b65e99..2687322 100644
+index a8c287a68febaaba73a35f18eefcc6800cce85f6..fe8623557a3a179e78461eab1f4e4f498e65da5b 100644
 --- a/passthroughserver/main.cpp
 +++ b/passthroughserver/main.cpp
-@@ -101,7 +101,7 @@ QSharedPointer<MInputContextConnection> createConnection(const MImServerConnecti
+@@ -64,7 +64,7 @@ QSharedPointer<MInputContextConnection> createConnection(const MImServerConnecti
  
  } // unnamed namespace
  
 -int main(int argc, char **argv)
 +Q_DECL_EXPORT int main(int argc, char **argv)
  {
-     qInstallMessageHandler(outputMessagesToStdErr);
- 
--- 
-2.35.1
-
+     // compatibility with MALIIT_DEBUG
+     defaultLoggingFilter = QLoggingCategory::installFilter(loggingCategoryFilter);

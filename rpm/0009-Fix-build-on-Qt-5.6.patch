@@ -9,10 +9,10 @@ The compose plugin as fallback not available even on sailfish.
  1 file changed, 4 insertions(+)
 
 diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
-index d1f49d4..b95a195 100644
+index 94030936c18e816b06237c789d3f1b4456ee632e..fa0ad63cf7f350108851e469a026c9e9839d4ee7 100644
 --- a/input-context/minputcontext.cpp
 +++ b/input-context/minputcontext.cpp
-@@ -62,8 +62,12 @@ MInputContext::MInputContext()
+@@ -61,8 +61,12 @@ MInputContext::MInputContext()
        preeditCursorPos(-1),
        redirectKeys(false),
        currentFocusAcceptsInput(false),
@@ -25,6 +25,3 @@ index d1f49d4..b95a195 100644
  {
      QByteArray debugEnvVar = qgetenv("MALIIT_DEBUG");
      if (!debugEnvVar.isEmpty() && debugEnvVar != "0") {
--- 
-2.35.1
-

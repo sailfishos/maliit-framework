@@ -1,7 +1,7 @@
 Name:       maliit-framework-wayland
 
 Summary:    Core libraries of Maliit and server (Lipstick/Wayland environment)
-Version:    2.2.1
+Version:    2.3.0
 Release:    1
 License:    LGPLv2
 URL:        https://github.com/sailfishos/maliit-framework
@@ -37,9 +37,8 @@ Patch6: 0006-Forward-arbitrary-extension-properties-to-QML-input-.patch
 Patch7: 0007-Use-non-abstract-unix-domain-socket.-JB-52254.patch
 Patch8: 0008-Allow-D-Bus-activation-only-through-systemd.-JB-5257.patch
 Patch9: 0009-Fix-build-on-Qt-5.6.patch
-Patch10: 0010-Revert-Fix-mapping-between-screen-orientations-and-r.patch
-Patch11: 0011-Install-.prf-files-as-per-sailfish-setup.patch
-Patch12: 0012-Fix-maliit-defines.prf-paths.patch
+Patch10: 0010-Install-.prf-files-as-per-sailfish-setup.patch
+Patch11: 0011-ut_mimserveroptions-Move-the-operator-definition-to-.patch
 
 %description
 Core libraries of Maliit and server
@@ -85,22 +84,17 @@ maliit keyboard via glib apis
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-mkdir -p build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr \
+%cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -Denable-docs=OFF \
       -Denable-glib=ON \
       -Denable-xcb=OFF \
       -Denable-wayland=OFF \
-      -Denable-dbus-activation=ON \
-      ..
+      -Denable-dbus-activation=ON
 
-%make_build
+%cmake_build
 
 %install
-cd build
-make install DESTDIR=%{buildroot}
-cd ..
+%cmake_install
 install -D -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/maliit-server.sh
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_userunitdir}/maliit-server.service
 mkdir -p %{buildroot}%{_userunitdir}/user-session.target.wants
@@ -116,7 +110,6 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
 %license LICENSE.LGPL
 %{_bindir}/maliit-server
 %{_libdir}/libmaliit-plugins.so.*
@@ -132,11 +125,9 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %{_libdir}/libmaliit-glib.so.*
 
 %files inputcontext
-%defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/platforminputcontexts/*.so
 
 %files devel
-%defattr(-,root,root,-)
 %{_libdir}/libmaliit-plugins.so
 %{_includedir}/maliit-2/
 %{_libdir}/pkgconfig/*.pc
@@ -146,6 +137,5 @@ sed -i -e 's:@PATH@:%{_libdir}/maliit-framework-tests:g' %{buildroot}/opt/tests/
 %{_libdir}/libmaliit-glib.so
 
 %files tests
-%defattr(-,root,root,-)
 %{_libdir}/maliit-framework-tests/
 /opt/tests/maliit-framework/tests.xml
