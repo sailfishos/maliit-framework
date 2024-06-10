@@ -7,19 +7,15 @@ Before switch to cmake on commit 7471153ce the unit test files were
 installed, and with cmake there are some parts of it done.
 Reintroduce the installation as these are needed if the build
 environment is not, and perhap cannot be, used for testing.
-
-Also cope on the qml unit test for the example plugin not availabe
-as it's built optionally.
 ---
- CMakeLists.txt                                       | 12 ++++++++++--
- .../ut_minputmethodquickplugin.cpp                   |  5 ++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a29ea4f..a1cebdd 100644
+index 7d4d1f26a032a08f45c7fd05ed83bec3d3e7e120..eecc1aa73dfde91ac1e68bff76bd987f8f2058c5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -511,6 +511,7 @@ if(enable-tests)
+@@ -490,6 +490,7 @@ if(enable-tests)
      set(DUMMY_PLUGINS dummyimplugin dummyimplugin2 dummyimplugin3 dummyplugin)
  
      set_property(TARGET ${DUMMY_PLUGINS} PROPERTY LIBRARY_OUTPUT_DIRECTORY ${TEST_PLUGINS_DIR})
@@ -27,25 +23,15 @@ index a29ea4f..a1cebdd 100644
  
      add_library(test-utils STATIC
              tests/utils/core-utils.cpp
-@@ -520,8 +521,8 @@ if(enable-tests)
-     target_link_libraries(test-utils PUBLIC Qt5::Core Qt5::Gui Qt5::Test maliit-connection)
-     target_include_directories(test-utils INTERFACE tests/utils)
-     target_compile_definitions(test-utils PUBLIC
--            -DMALIIT_TEST_PLUGINS_DIR="${CMAKE_INSTALL_PREFIX}/lib/maliit-framework-tests/plugins"
--            -DMALIIT_TEST_DATA_PATH="${CMAKE_INSTALL_PREFIX}/lib/maliit-framework-tests"
-+            -DMALIIT_TEST_PLUGINS_DIR="${CMAKE_INSTALL_FULL_LIBDIR}/maliit-framework-tests/plugins"
-+            -DMALIIT_TEST_DATA_PATH="${CMAKE_INSTALL_FULL_LIBDIR}/maliit-framework-tests"
-             -DIN_TREE_TEST_PLUGIN_DIR="${CMAKE_SOURCE_DIR}/examples/plugins")
- 
-     add_library(test-stubs STATIC
-@@ -540,14 +541,21 @@ if(enable-tests)
+@@ -519,6 +520,7 @@ if(enable-tests)
          list(REMOVE_AT _libs 0)
          target_link_libraries(${name} test-utils maliit-plugins ${_libs})
          add_test(${name} ${name})
 +        install(TARGETS ${name} DESTINATION ${CMAKE_INSTALL_LIBDIR}/maliit-framework-tests/${name})
  
          set(test_targets ${test_targets} ${name} PARENT_SCOPE)
-     endfunction()
+         if(install-tests)
+@@ -528,8 +530,14 @@ if(enable-tests)
  
      create_test(sanitychecks)
      create_test(ut_mattributeextensionmanager)
@@ -60,22 +46,3 @@ index a29ea4f..a1cebdd 100644
      create_test(ut_mimpluginmanagerconfig)
      create_test(ut_mimserveroptions)
      create_test(ut_mimsettings)
-diff --git a/tests/ut_minputmethodquickplugin/ut_minputmethodquickplugin.cpp b/tests/ut_minputmethodquickplugin/ut_minputmethodquickplugin.cpp
-index 33ec902..4b7c4f2 100644
---- a/tests/ut_minputmethodquickplugin/ut_minputmethodquickplugin.cpp
-+++ b/tests/ut_minputmethodquickplugin/ut_minputmethodquickplugin.cpp
-@@ -64,7 +64,10 @@ void Ut_MInputMethodQuickPlugin::testQmlSetup()
-                 QDir(IN_TREE_TEST_PLUGIN_DIR"/qml") : QDir(MALIIT_TEST_PLUGINS_DIR"/examples/qml");
-     const QString pluginPath = pluginDir.absoluteFilePath(testPluginPath);
-     const QString pluginId = QFileInfo(testPluginPath).baseName();
--    QVERIFY(pluginDir.exists(pluginPath));
-+
-+    if (!pluginDir.exists(pluginPath)) {
-+        QSKIP("QML Example plugin not available");
-+    }
- 
-     QObject *pluginInstance = 0;
-     Maliit::Plugins::InputMethodPlugin *plugin = 0;
--- 
-2.35.1
-

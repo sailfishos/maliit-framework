@@ -23,7 +23,7 @@ Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
  1 file changed, 34 insertions(+), 7 deletions(-)
 
 diff --git a/connection/serverdbusaddress.cpp b/connection/serverdbusaddress.cpp
-index 67fe0a2..64c0307 100644
+index 67fe0a2321be9706d75ed66245274a99833b4d95..64c03073342fe7c9853fa6cafde1e4fa2904c0e5 100644
 --- a/connection/serverdbusaddress.cpp
 +++ b/connection/serverdbusaddress.cpp
 @@ -1,7 +1,8 @@
@@ -91,6 +91,3 @@ index 67fe0a2..64c0307 100644
      return server;
  }
  
--- 
-2.35.1
-
