@@ -89,7 +89,8 @@ maliit keyboard via glib apis
       -Denable-glib=ON \
       -Denable-xcb=OFF \
       -Denable-wayland=OFF \
-      -Denable-dbus-activation=ON
+      -Denable-dbus-activation=ON \
+      -Dinstall-tests=ON
 
 %cmake_build
 
