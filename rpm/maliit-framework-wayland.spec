@@ -38,7 +38,6 @@ Patch7: 0007-Use-non-abstract-unix-domain-socket.-JB-52254.patch
 Patch8: 0008-Allow-D-Bus-activation-only-through-systemd.-JB-5257.patch
 Patch9: 0009-Fix-build-on-Qt-5.6.patch
 Patch10: 0010-Install-.prf-files-as-per-sailfish-setup.patch
-Patch11: 0011-ut_mimserveroptions-Move-the-operator-definition-to-.patch
 
 %description
 Core libraries of Maliit and server
