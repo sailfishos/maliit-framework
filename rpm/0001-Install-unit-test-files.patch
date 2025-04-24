@@ -12,7 +12,7 @@ environment is not, and perhap cannot be, used for testing.
  1 file changed, 8 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7d4d1f26a032a08f45c7fd05ed83bec3d3e7e120..eecc1aa73dfde91ac1e68bff76bd987f8f2058c5 100644
+index 7d4d1f2..eecc1aa 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -490,6 +490,7 @@ if(enable-tests)

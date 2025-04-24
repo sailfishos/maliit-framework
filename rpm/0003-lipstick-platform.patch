@@ -20,7 +20,7 @@ directory
  create mode 100644 src/lipstickplatform.h
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index eecc1aa73dfde91ac1e68bff76bd987f8f2058c5..9333aace091a314084fce2e2f423430e922daaa5 100644
+index eecc1aa..9333aac 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -14,6 +14,7 @@ option(enable-glib "Build GLib support" ON)
@@ -46,7 +46,7 @@ index eecc1aa73dfde91ac1e68bff76bd987f8f2058c5..9333aace091a314084fce2e2f423430e
      list(APPEND PLUGINS_SOURCES
           src/mimhwkeyboardtracker.cpp
 diff --git a/src/abstractplatform.cpp b/src/abstractplatform.cpp
-index 0b01e6635c9f8c00cb33fc54750ed71c749dfd6c..5d2c380d7781ee154622c521ffb0970d125dce77 100644
+index 0b01e66..5d2c380 100644
 --- a/src/abstractplatform.cpp
 +++ b/src/abstractplatform.cpp
 @@ -20,6 +20,9 @@
@@ -71,7 +71,7 @@ index 0b01e6635c9f8c00cb33fc54750ed71c749dfd6c..5d2c380d7781ee154622c521ffb0970d
          return std::unique_ptr<AbstractPlatform>(new Maliit::WaylandPlatform);
 diff --git a/src/lipstickplatform.cpp b/src/lipstickplatform.cpp
 new file mode 100644
-index 0000000000000000000000000000000000000000..4975879da3977f49434336565198ae775c96448f
+index 0000000..4975879
 --- /dev/null
 +++ b/src/lipstickplatform.cpp
 @@ -0,0 +1,82 @@
@@ -159,7 +159,7 @@ index 0000000000000000000000000000000000000000..4975879da3977f49434336565198ae77
 +} // namespace Maliit
 diff --git a/src/lipstickplatform.h b/src/lipstickplatform.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..226551a147794e790ad1dce97aa24193d791cf49
+index 0000000..226551a
 --- /dev/null
 +++ b/src/lipstickplatform.h
 @@ -0,0 +1,30 @@

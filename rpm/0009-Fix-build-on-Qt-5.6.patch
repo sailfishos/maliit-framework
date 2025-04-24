@@ -9,7 +9,7 @@ The compose plugin as fallback not available even on sailfish.
  1 file changed, 4 insertions(+)
 
 diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
-index 94030936c18e816b06237c789d3f1b4456ee632e..fa0ad63cf7f350108851e469a026c9e9839d4ee7 100644
+index 9403093..fa0ad63 100644
 --- a/input-context/minputcontext.cpp
 +++ b/input-context/minputcontext.cpp
 @@ -61,8 +61,12 @@ MInputContext::MInputContext()
