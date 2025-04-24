@@ -12,7 +12,7 @@ Subject: [PATCH] Forward arbitrary extension properties to QML input methods.
  4 files changed, 53 insertions(+), 2 deletions(-)
 
 diff --git a/input-context/minputcontext.cpp b/input-context/minputcontext.cpp
-index c300753f64d094fa2db44aac992d89a6e3f7a2c7..94030936c18e816b06237c789d3f1b4456ee632e 100644
+index c300753..9403093 100644
 --- a/input-context/minputcontext.cpp
 +++ b/input-context/minputcontext.cpp
 @@ -708,8 +708,18 @@ void MInputContext::setDetectableAutoRepeat(bool enabled)
@@ -35,7 +35,7 @@ index c300753f64d094fa2db44aac992d89a6e3f7a2c7..94030936c18e816b06237c789d3f1b44
  
      if (!inputMethodAccepted() || !qGuiApp->focusObject()) {
 diff --git a/src/mimpluginmanager.cpp b/src/mimpluginmanager.cpp
-index b5048a6075642b493ecbf5ed90d6929368927c9c..72fa44a52da85ea1f804609e2cd0677554104302 100644
+index b5048a6..72fa44a 100644
 --- a/src/mimpluginmanager.cpp
 +++ b/src/mimpluginmanager.cpp
 @@ -1476,7 +1476,14 @@ void MIMPluginManager::handleWidgetStateChanged(unsigned int clientId,
@@ -55,7 +55,7 @@ index b5048a6075642b493ecbf5ed90d6929368927c9c..72fa44a52da85ea1f804609e2cd06775
  
      variant = newState[FocusStateAttribute];
 diff --git a/src/quick/inputmethodquick.cpp b/src/quick/inputmethodquick.cpp
-index a12bcbb3959c9dc6217f5fc00badabe30af25543..43c357343f0e4dd8ccc282231561feaebe2956a0 100644
+index a12bcbb..43c3573 100644
 --- a/src/quick/inputmethodquick.cpp
 +++ b/src/quick/inputmethodquick.cpp
 @@ -19,6 +19,7 @@
@@ -122,7 +122,7 @@ index a12bcbb3959c9dc6217f5fc00badabe30af25543..43c357343f0e4dd8ccc282231561feae
 +
  } // namespace Maliit
 diff --git a/src/quick/inputmethodquick.h b/src/quick/inputmethodquick.h
-index 1a1af47f1f1cb9661c1305923ad4ee5c857feee9..881511a2c34b1df8adc9f3cdb24eb5429ddc1abd 100644
+index 1a1af47..881511a 100644
 --- a/src/quick/inputmethodquick.h
 +++ b/src/quick/inputmethodquick.h
 @@ -72,7 +72,7 @@ class InputMethodQuick

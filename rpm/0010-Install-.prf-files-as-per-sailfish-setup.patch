@@ -8,7 +8,7 @@ Subject: [PATCH] Install .prf files as per sailfish setup
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 0120de848ffc9363f6d5ad2b8a3347928556a81c..d94462222c693967b59e9f56a5c485dc334ec325 100644
+index 0120de8..d944622 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -29,7 +29,7 @@ if(NOT DEFINED QT5_PLUGINS_INSTALL_DIR)

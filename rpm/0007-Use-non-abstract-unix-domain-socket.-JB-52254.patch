@@ -19,43 +19,41 @@ removal / replacement of other unrelated unix sockets.
 
 Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
 ---
- connection/serverdbusaddress.cpp | 41 ++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 7 deletions(-)
+ connection/serverdbusaddress.cpp | 39 ++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 7 deletions(-)
 
 diff --git a/connection/serverdbusaddress.cpp b/connection/serverdbusaddress.cpp
-index 67fe0a2321be9706d75ed66245274a99833b4d95..64c03073342fe7c9853fa6cafde1e4fa2904c0e5 100644
+index 19f46d4..31f960e 100644
 --- a/connection/serverdbusaddress.cpp
 +++ b/connection/serverdbusaddress.cpp
-@@ -1,7 +1,8 @@
- /* * This file is part of Maliit framework *
+@@ -2,6 +2,7 @@
   *
-- * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
-+ * Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
   * All rights reserved.
 + * Copyright (c) 2021 Jolla Ltd.
   *
   *
   * This library is free software; you can redistribute it and/or
-@@ -17,9 +18,14 @@
+@@ -17,9 +18,13 @@
  #include <QDBusConnection>
- 
  #include <QDBusServer>
+ #include <QStandardPaths>
 +#include <QDir>
  
  #include <cstdlib>
  
 +#include <sys/stat.h>
-+
 +#include <unistd.h>
 +
  namespace {
      const char * const MaliitServerName = "org.maliit.server";
      const char * const MaliitServerObjectPath = "/org/maliit/server/address";
-@@ -61,12 +67,33 @@ DynamicAddress::DynamicAddress()
+@@ -61,13 +66,33 @@ DynamicAddress::DynamicAddress()
  
  QDBusServer* DynamicAddress::connect()
  {
--    QLatin1String dbusAddress("unix:tmpdir=/tmp/maliit-server");
+-    auto runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+-    auto dbusAddress = QLatin1String("unix:path=%1/maliit-server").arg(runtimeDir);
 -
 -    QDBusServer *server = new QDBusServer(dbusAddress);
 -

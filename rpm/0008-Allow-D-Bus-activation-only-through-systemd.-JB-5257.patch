@@ -12,7 +12,7 @@ Signed-off-by: Simo Piiroinen <simo.piiroinen@jolla.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/connection/org.maliit.server.service.in b/connection/org.maliit.server.service.in
-index c9ba19fb5e7a48ae5fefba3d1f210596336873db..32e2b30a6e1cb3f717e2afc3b50c0cd7b489fe89 100644
+index c9ba19f..32e2b30 100644
 --- a/connection/org.maliit.server.service.in
 +++ b/connection/org.maliit.server.service.in
 @@ -1,5 +1,5 @@

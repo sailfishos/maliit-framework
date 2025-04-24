@@ -10,7 +10,7 @@ Subject: [PATCH] Use mce for keyboard state. Fixes JB#48910
  3 files changed, 95 insertions(+), 4 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4ce3f9ec81345426c3131a1081b6b91938983095..0120de848ffc9363f6d5ad2b8a3347928556a81c 100644
+index 4ce3f9e..0120de8 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -18,6 +18,7 @@ option(enable-lipstick "Compile with Lipstick integration support" ON)
@@ -47,7 +47,7 @@ index 4ce3f9ec81345426c3131a1081b6b91938983095..0120de848ffc9363f6d5ad2b8a334792
      find_package(GLib2)
      find_package(GIO)
 diff --git a/src/mimhwkeyboardtracker.cpp b/src/mimhwkeyboardtracker.cpp
-index d793ea06459825627d29276c8b6914cefc4e3706..30b80876b89d2ebe285dc8d95eaad9a23a556301 100644
+index 7da8702..f965160 100644
 --- a/src/mimhwkeyboardtracker.cpp
 +++ b/src/mimhwkeyboardtracker.cpp
 @@ -16,9 +16,21 @@
@@ -115,7 +115,7 @@ index d793ea06459825627d29276c8b6914cefc4e3706..30b80876b89d2ebe285dc8d95eaad9a2
      // Use udev to enumerate all input devices, using evdev on each device to
 @@ -158,6 +191,35 @@ void MImHwKeyboardTrackerPrivate::tryEvdevDevice(const char *device)
  
-     evdevTabletMode = TEST_BIT(SW_TABLET_MODE, state);
+     evdevTabletMode = TEST_BIT(SW_TABLET_MODE, swState);
  }
 +#endif
 +
@@ -166,7 +166,7 @@ index d793ea06459825627d29276c8b6914cefc4e3706..30b80876b89d2ebe285dc8d95eaad9a2
 +#endif
  }
 diff --git a/src/mimhwkeyboardtracker_p.h b/src/mimhwkeyboardtracker_p.h
-index 0c144625d6f029fa55baa1741fd7fd52c8cb5e0e..18895816699fa019d3a1de2e81c8b5f3b5daea2b 100644
+index 0c14462..1889581 100644
 --- a/src/mimhwkeyboardtracker_p.h
 +++ b/src/mimhwkeyboardtracker_p.h
 @@ -17,6 +17,10 @@
